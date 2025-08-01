@@ -1,23 +1,26 @@
-# Core Application & Web Server
+# Core web
 flask
 gunicorn
 python-dotenv
 
-# LangChain and AI Services (Pydantic v2–compatible)
-langchain>=0.2,<0.3
-langchain-openai>=0.1,<0.2
-langchain-community>=0.0,<0.1
-openai>=1.25
-tiktoken
-tavily-python>=0.3
+# LangChain (0.3 family — keep these ranges aligned)
+langchain>=0.3,<0.4
+langchain-core>=0.3,<0.4
+langchain-community>=0.3,<0.4
+langchain-openai>=0.3,<0.4
+# Optional but common with 0.3
+langchain-text-splitters>=0.3,<0.4
+langsmith>=0.1.70
 
-# Pydantic v2
+# Providers & tools
+openai>=1.30
+tiktoken>=0.7
+tavily-python>=0.4  # and set TAVILY_API_KEY
+
+# Pydantic v2 stack
 pydantic>=2.7,<3
 pydantic-settings>=2.3
 typing-extensions>=4.12
 
-# Observability / LangSmith (v2-compatible)
-langsmith>=0.1.70
-
-# Other tools
+# Other
 tweepy
