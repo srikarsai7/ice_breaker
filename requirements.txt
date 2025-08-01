@@ -1,19 +1,22 @@
-# requirements.txt
-
 # Core Application & Web Server
 flask
 gunicorn
 python-dotenv
 
-# LangChain and AI Services
-langchain==0.1.5
-langchain-openai==0.0.5
-openai==1.17.0
+# LangChain and AI Services (Pydantic v2–compatible)
+langchain>=0.2,<0.3
+langchain-openai>=0.1,<0.2
+openai>=1.25
 tiktoken
-tavily-python
+tavily-python>=0.3
 
-# Pydantic pinned to a stable V1 release to avoid conflicts
-pydantic==1.10.13
+# Pydantic v2
+pydantic>=2.7,<3
+pydantic-settings>=2.3
+typing-extensions>=4.12
+
+# Observability / LangSmith (v2-compatible)
+langsmith>=0.1.70
 
 # Other tools
 tweepy
