@@ -1,30 +1,32 @@
-from flask import Flask, render_template, request, jsonify
-from dotenv import load_dotenv
+# app.py
 
-from ice_breaker import ice_break_with
+import json
+from flask import Flask, render_template, request, Response
+from dotenv import load_dotenv
+from ice_breaker import ice_break_with_generator
 
 load_dotenv()
 
 app = Flask(__name__)
 
-
 @app.route("/")
 def index():
     return render_template("index.html")
 
-
-@app.route("/process", methods=["POST"])
+@app.route("/process", methods=["GET"])
 def process():
-    name = request.form["name"]
-    summary, profile_pic_url = ice_break_with(name=name)
-    return jsonify(
-        {
-            "summary_and_facts": summary.to_dict(),
-            "picture_url": profile_pic_url,
-        }
-    )
+
+    name = request.args.get("name", "")
+    
+    def stream_process(name_to_process: str):
+        for event in ice_break_with_generator(name=name_to_process):
+            sse_event = f"data: {json.dumps(event)}\n\n"
+            yield sse_event
+            
+
+    return Response(stream_process(name), mimetype='text/event-stream')
 
 
 if __name__ == "__main__":
-
-    app.run(host="0.0.0.0", debug=True)
+    # The 'threaded=True' is crucial for streaming to work without blocking.
+    app.run(host="0.0.0.0", debug=True, threaded=True)

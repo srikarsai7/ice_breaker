@@ -1,87 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Ice Breaker</title>
-        <link rel="stylesheet" href="https://unpkg.com/mvp.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@chgibb/css-spinners@2.2.1/css/spinner/three-quarters.min.css">
-    </head>
-    <body>
-        <header>
-            <form id="name-form" style="margin: 0 auto">
-                <h1>Ice Breaker</h1>
-                <input type="text" name="name" placeholder="Enter name">
-                <button id="magic-button" type="submit" class="center">Do Your Magic</button>
-            </form>
-        </header>
-        <div id="spinner" style="text-align: center; display: none">
-            <span class="three-quarters-loader" style="width: 100px; height: 100px; border-radius: 50%; border-width: 12px;"></span>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ice Breaker Pro</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@chgibb/css-spinners@2.2.1/css/spinner/three-quarters.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 1. Modern Color Palette & Base Styles --- */
+        :root {
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --background-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --light-text: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 1rem;
+        }
+
+        /* --- 2. Header and Form Elements --- */
+        header {
+            text-align: center;
+            padding: 2rem 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: var(--light-text);
+            margin-bottom: 2rem;
+        }
+
+        #name-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        #magic-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        #magic-button:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        /* --- 3. Containers and Layout --- */
+        main {
+            max-width: 900px;
+            margin: 1rem auto;
+        }
+
+        #reasoning-container, #result-container {
+            display: none;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        #reasoning-container { margin-bottom: 2rem; }
+
+        h2 {
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-content { display: flex; flex-wrap: wrap; gap: 2rem; }
+        .profile-pic-column { flex: 1; min-width: 250px; text-align: center; }
+        .details-column { flex: 2; min-width: 300px; }
+        
+        #profile-pic {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 6px solid var(--card-bg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        ul { padding-left: 1.2rem; }
+        li { margin-bottom: 0.5rem; }
+
+        /* --- 4. Special Components: Spinner, Error, Reasoning Box --- */
+        .spinner-container { text-align: center; padding: 4rem 0; display: none; }
+        .three-quarters-loader { width: 60px; height: 60px; border-width: 8px; }
+
+        #error-container { display: none; max-width: 900px; margin: 1rem auto; padding: 1rem; background-color: #ffebee; color: #c62828; border: 1px solid #c62828; border-radius: 8px; text-align: center; }
+        
+        .reasoning-box {
+            background-color: #263238; color: #eceff1; padding: 1rem;
+            border-radius: 8px; font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em;
+            max-height: 400px; overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <form id="name-form">
+            <h1>Ice Breaker Pro</h1>
+            <p>Enter a person's name to discover interesting facts, conversation starters, and see the AI's thought process in real-time.</p>
+            <input type="text" id="name-input" name="name" placeholder="E.g., Eden Marco" required>
+            <br>
+            <button id="magic-button" type="submit">Do Your Magic</button>
+        </form>
+    </header>
+    
+    <div id="spinner-container" class="spinner-container"><span class="three-quarters-loader"></span></div>
+    <div id="error-container"><p id="error-message"></p></div>
+
+    <main id="reasoning-container">
+        <section>
+            <h2>Agent's Search Process</h2>
+            <div id="reasoning" class="reasoning-box"></div>
+        </section>
+    </main>
+
+    <main id="result-container">
+        <div class="result-content">
+            <div class="profile-pic-column">
+                <img id="profile-pic" src="" alt="Profile Picture">
+            </div>
+            <div class="details-column">
+                <section>
+                    <h2>Summary</h2>
+                    <p id="summary"></p>
+                </section>
+                <section>
+                    <h2>Interesting Facts</h2>
+                    <div id="facts"></div>
+                </section>
+                <section>
+                    <h2>Ice Breakers</h2>
+                    <div id="ice-breakers"></div>
+                </section>
+                <section>
+                    <h2>Topics of Interest</h2>
+                    <div id="topics-of-interest"></div>
+                </section>
+                <section>
+                    <h2>Sources</h2>
+                    <div id="sources"></div>
+                </section>
+            </div>
         </div>
-        <main id="result" style="display: none">
-            <div style="text-align: center">
-                <img id="profile-pic" src="" alt="Profile Picture" style="width: 300px; max-width: 100%; height: auto; border-radius: 50%; margin-bottom: 20px;">
-            </div>
-            <div>
-                <h2>Summary</h2>
-                <p id="summary"></p>
-            </div>
-            <div>
-                <h2>Interesting Facts</h2>
-                <div id="facts"></div>
-            </div>
-            <div>
-                <h2>Ice Breakers</h2>
-                <div id="ice-breakers"></div>
-            </div>
-            <div>
-                <h2>Topics of Interest</h2>
-                <div id="topics-of-interest"></div>
-            </div>
-        </main>
+    </main>
 
-        <script>
-            const form = document.getElementById("name-form");
-            const spinner = document.getElementById("spinner");
-            const result = document.getElementById("result");
+    <script>
+        const form = document.getElementById("name-form");
+        const spinner = document.getElementById("spinner-container");
+        const reasoningContainer = document.getElementById("reasoning-container");
+        const resultContainer = document.getElementById("result-container");
+        const errorContainer = document.getElementById("error-container");
+        const reasoningBox = document.getElementById("reasoning");
+        const profilePic = document.getElementById("profile-pic");
 
-            form.addEventListener("submit", (ev) => {
-                ev.preventDefault();
+        // --- NEW: SVG data for the placeholder icon ---
+        const placeholderSvg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23e0e0e0"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" /></svg>';
 
-                result.style.display = "none";
-                spinner.style.display = "";
+        let eventSource;
 
-                const formData = new FormData(form);
+        form.addEventListener("submit", (ev) => {
+            ev.preventDefault();
+            if (eventSource) { eventSource.close(); }
 
-                fetch("/process", {method: "POST", body: formData})
-                    .then(response => {
-                        if (response.ok) return response.json();
-                        throw new Error("POST request failed");
-                    })
-                    .then(data => {
-                        document.getElementById("profile-pic").src = data.picture_url;
-                        document.getElementById("summary").textContent = data.summary_and_facts.summary;
-                        createHtmlList(document.getElementById("facts"), data.summary_and_facts.facts);
-<!--                        createHtmlList(document.getElementById("ice-breakers"), data.ice_breakers.ice_breakers);-->
-<!--                        createHtmlList(document.getElementById("topics-of-interest"), data.interests.topics_of_interest);-->
+            // Reset UI
+            reasoningContainer.style.display = "none";
+            resultContainer.style.display = "none";
+            errorContainer.style.display = "none";
+            reasoningBox.innerHTML = "";
+            profilePic.src = placeholderSvg; // Set to placeholder initially
+            spinner.style.display = "block";
 
-                        spinner.style.display = "none";
-                        result.style.display = "";
-                    })
+            const name = document.getElementById("name-input").value;
+            eventSource = new EventSource(`/process?name=${encodeURIComponent(name)}`);
+
+            eventSource.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                spinner.style.display = "none";
+
+                switch (data.type) {
+                    case "status":
+                    case "reasoning":
+                        reasoningContainer.style.display = "block";
+                        reasoningBox.innerHTML += data.payload.replace(/\n/g, '<br>');
+                        reasoningBox.scrollTop = reasoningBox.scrollHeight;
+                        break;
+                    
+                    case "final_result":
+                        const resultData = data.payload;
+                        
+                        // --- NEW: Handle profile picture with placeholder fallback ---
+                        profilePic.src = resultData.picture_url || placeholderSvg;
+
+                        document.getElementById("summary").textContent = resultData.summary_and_facts.summary;
+                        createHtmlList(document.getElementById("facts"), resultData.summary_and_facts.facts);
+                        createHtmlList(document.getElementById("ice-breakers"), resultData.summary_and_facts.ice_breakers);
+                        createHtmlList(document.getElementById("topics-of-interest"), resultData.summary_and_facts.topics_of_interest);
+                        createLinkList(document.getElementById("sources"), resultData.sources);
+                        resultContainer.style.display = "block";
+                        break;
+
+                    case "error":
+                        handleError(data.payload);
+                        eventSource.close();
+                        break;
+                    
+                    case "end":
+                        eventSource.close();
+                        break;
+                }
+            };
+
+            eventSource.onerror = function (err) {
+                handleError("A connection error occurred. The server might be down.");
+                if (eventSource) { eventSource.close(); }
+            };
+        });
+        
+        function handleError(message) {
+            document.getElementById("error-message").textContent = message;
+            errorContainer.style.display = "block";
+            spinner.style.display = "none";
+        }
+
+        function createHtmlList(element, items) {
+            if (!items || items.length === 0) { element.innerHTML = "<p>N/A</p>"; return; }
+            const ul = document.createElement("ul");
+            items.forEach(itemText => {
+                const li = document.createElement("li");
+                li.textContent = itemText;
+                ul.appendChild(li);
             });
+            element.innerHTML = ""; element.appendChild(ul);
+        }
 
-            function createHtmlList(element, items)
-            {
-                const ul = document.createElement("ul");
-
-                items.forEach(item => {
-                    const li = document.createElement("li");
-                    li.textContent = item;
-                    ul.appendChild(li);
-                })
-
-                element.innerHTML = "";
-                element.appendChild(ul);
-            }
-        </script>
-    </body>
+        function createLinkList(element, urls) {
+            if (!Array.isArray(urls) || urls.length === 0) { element.innerHTML = "<p>No sources provided.</p>"; return; }
+            const ul = document.createElement("ul");
+            urls.forEach(url => {
+                const li = document.createElement("li");
+                const a = document.createElement("a");
+                a.href = url; a.textContent = url; a.target = "_blank"; a.rel = "noopener noreferrer";
+                li.appendChild(a);
+                ul.appendChild(li);
+            });
+            element.innerHTML = ""; element.appendChild(ul);
+        }
+    </script>
+</body>
 </html>
